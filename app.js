@@ -1,57 +1,27 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
+const express = require('express');
+const path = require('path');
+
+const app = express();
 const port = 3000;
 
-const server = http.createServer(function (req, res) {
-  let contentType = "text/html";
-  let filePath = "." + req.url;
-  if (filePath == "./") {
-    filePath = "./index.html";
-  }
-  const extname = path.extname(filePath);
-  switch (extname) {
-    case ".js":
-      contentType = "text/javascript";
-      break;
-    case ".css":
-      contentType = "text/css";
-      break;
-    case ".json":
-      contentType = "application/json";
-      break;
-    case ".png":
-      contentType = "image/png";
-      break;
-    case ".jpg":
-      contentType = "image/jpg";
-      break;
-    case ".ico":
-      contentType = "image/x-icon";
-      break;
-  }
+app.use(express.static('public'));
+app.use(express.static('style'));
 
-  fs.readFile(filePath, function (error, data) {
-    if (error) {
-      if (error.code == "ENOENT") {
-        res.writeHead(404, { "Content-Type": "text/html" });
-        res.end("Error: File not found", "utf-8");
-      } else {
-        res.writeHead(500);
-        res.end("Server error: " + error.code);
-      }
-    } else {
-      res.writeHead(200, { "Content-Type": contentType });
-      res.end(data, "utf-8");
-    }
-  });
+// Route for the home page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-server.listen(port, function (error) {
-  if (error) {
-    console.log("Something went wrong.", error);
-  } else {
-    console.log("Server is listening on port", port);
-  }
+// Route for the about page
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'about.html'));
 });
 
+// Route for the research page
+app.get('/research', (req, res) => {
+  res.sendFile(path.join(__dirname, 'research.html'));
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
